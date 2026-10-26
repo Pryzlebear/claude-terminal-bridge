@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.2.2 (Bridge fork)
+
+- Fix: package-lock.json was missing from the repository (npm ci failed during the build).
+
 ## 2.6.2.1 (Bridge fork)
 
 - Claude Terminal Bridge: MCP server on port 8099 for the Claude app (delegate tasks to this Claude Code instance, follow-up questions, handoff to the terminal), with OAuth, guard hook and HA notifications. See BRIDGE.md.
