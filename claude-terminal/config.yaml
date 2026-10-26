@@ -1,13 +1,12 @@
 ---
-name: "Claude Terminal"
-description: "Web terminal with Anthropic's Claude Code CLI and persistent auth"
-version: "2.6.2"
+name: "Claude Terminal Bridge"
+description: "Claude Terminal plus an MCP bridge so the Claude app can delegate tasks to it"
+version: "2.6.2.1"
 slug: "claude_terminal"
 init: false
 
-# Prebuilt images on GHCR — the Supervisor pulls these instead of building
-# locally (no build OOM, no image blobs in backups). Tag = version below.
-image: "ghcr.io/heytcass/{arch}-addon-claude-terminal"
+# Bridge fork: no prebuilt image — the Supervisor builds this add-on locally
+# from the Dockerfile (upstream pulls ghcr.io/heytcass/{arch}-addon-claude-terminal).
 
 # Supported architectures (armv7 dropped in 2.5.0: HAOS dropped 32-bit ARM,
 # and neither Claude Code native builds nor managed Python exist for it)
@@ -16,7 +15,7 @@ arch:
   - amd64
 
 # External resources
-url: "https://github.com/heytcass/home-assistant-addons"
+url: "https://github.com/Pryzlebear/claude-terminal-bridge"
 
 # Web interface configuration
 ingress: true
@@ -28,7 +27,9 @@ panel_admin: true
 # Port configuration
 ports:
   7681/tcp: null
+  8099/tcp: 8099
 ports_description:
+  8099/tcp: "Claude Terminal Bridge (MCP endpoint for the Claude app, OAuth-protected). Point your Tailscale Funnel / reverse proxy here."
   7681/tcp: "Direct web terminal access. Not needed for ingress, and NOT password-protected: anyone who can reach this port gets a root shell in the container, with no Home Assistant login. Leave unset unless the port is firewalled."
 
 # Add-on configuration options
@@ -45,6 +46,18 @@ options:
   ha_mcp_version: "7.11.0"
   persistent_apk_packages: []
   persistent_pip_packages: []
+  enable_bridge: true
+  bridge_public_url: ""
+  bridge_access_key: ""
+  bridge_permission_mode: "auto"
+  bridge_model: ""
+  bridge_timeout_minutes: 20
+  bridge_protected_domains:
+    - lock
+    - alarm_control_panel
+  bridge_protected_patterns: []
+  bridge_allowed_sources: []
+  bridge_notify: true
 schema:
   auto_launch_claude: bool?
   claude_auto_update: bool?
@@ -60,6 +73,19 @@ schema:
     - str
   persistent_pip_packages:
     - str
+  enable_bridge: bool?
+  bridge_public_url: url?
+  bridge_access_key: password?
+  bridge_permission_mode: list(auto|acceptEdits|dontAsk|plan|bypassPermissions)?
+  bridge_model: str?
+  bridge_timeout_minutes: int(1,120)?
+  bridge_protected_domains:
+    - str
+  bridge_protected_patterns:
+    - str
+  bridge_allowed_sources:
+    - str
+  bridge_notify: bool?
 
 # Volume mappings for file access
 map:

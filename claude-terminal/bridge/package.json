@@ -1,0 +1,20 @@
+{
+  "name": "claude-terminal-bridge",
+  "version": "1.0.0",
+  "description": "MCP bridge: lets the Claude app delegate tasks to Claude Code running in the Claude Terminal add-on",
+  "type": "module",
+  "main": "server.mjs",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node selftest.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7"
+  }
+}

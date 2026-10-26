@@ -64,5 +64,12 @@ COPY run.sh /run.sh
 COPY scripts/ /opt/scripts/
 RUN chmod +x /run.sh /opt/scripts/*.sh
 
+# Claude Terminal Bridge (MCP server for the Claude app). Dependencies are
+# pinned via package-lock.json and installed at build time, never at boot.
+COPY bridge/ /opt/bridge/
+RUN cd /opt/bridge \
+    && npm ci --omit=dev --no-audit --no-fund \
+    && rm -rf /opt/bridge/test /tmp/npm-cache
+
 # Use exec form for better signal handling
 CMD ["/run.sh"]

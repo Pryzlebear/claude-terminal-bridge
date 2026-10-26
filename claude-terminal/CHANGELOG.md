@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.6.2.1 (Bridge fork)
+
+- Claude Terminal Bridge: MCP server on port 8099 for the Claude app (delegate tasks to this Claude Code instance, follow-up questions, handoff to the terminal), with OAuth, guard hook and HA notifications. See BRIDGE.md.
+- No prebuilt GHCR image: the Supervisor builds the add-on locally.
+
 ## 2.6.2
 
 ### 📋 Copying: Shift+drag, and the terminal now says so

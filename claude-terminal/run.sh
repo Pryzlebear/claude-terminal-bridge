@@ -508,6 +508,15 @@ setup_ha_mcp() {
     fi
 }
 
+# Claude Terminal Bridge (fork addition): MCP server for the Claude app
+setup_bridge() {
+    if [ -f "/opt/scripts/start-bridge.sh" ]; then
+        # shellcheck source=/dev/null
+        source /opt/scripts/start-bridge.sh
+        start_bridge || bashio::log.warning "Bridge failed to start; terminal continues without it"
+    fi
+}
+
 # Main execution
 main() {
     bashio::log.info "Starting Claude Terminal add-on..."
@@ -521,6 +530,7 @@ main() {
     generate_ha_context
     start_login_url_watcher
     setup_ha_mcp
+    setup_bridge
     start_web_terminal
 }
 
