@@ -24,6 +24,14 @@ RUN apk add --no-cache \
     wget \
     yq
 
+# Security (eMudhra intermediate CA compromise, Oct 2026): force current CA
+# bundle, pip and certifi so a stale base-image layer cannot ship old trust
+# stores. Floors make the build fail instead of silently shipping old ones.
+RUN apk upgrade --no-cache ca-certificates \
+    && pip3 install --no-cache-dir --break-system-packages --upgrade \
+        "pip>=26.2.2" "certifi>=2026.10.19" \
+    && update-ca-certificates
+
 # uv from PyPI, pinned: Alpine 3.21's apk uv (0.5.x) cannot install managed
 # musl CPython builds, which ha-mcp >= 4.x needs (it requires Python 3.13;
 # Alpine 3.21 ships 3.12). musllinux wheels exist for all three arches.

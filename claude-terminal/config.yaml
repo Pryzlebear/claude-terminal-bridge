@@ -1,7 +1,7 @@
 ---
 name: "Claude Terminal Bridge"
 description: "Claude Terminal plus an MCP bridge so the Claude app can delegate tasks to it"
-version: "2.6.2.2"
+version: "2.6.2.3"
 slug: "claude_terminal"
 init: false
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.2.3 (Bridge fork)
+
+- Security: the image build now upgrades `ca-certificates` (>= 20261020-r0), `pip` (>= 26.2.2) and `certifi` (>= 2026.10.19) to distrust the compromised eMudhra intermediate certificate (Oct 2026).
+
 ## 2.6.2.2 (Bridge fork)
 
 - Fix: package-lock.json was missing from the repository (npm ci failed during the build).
