@@ -2,13 +2,17 @@ ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
 # All runtime packages are baked into the image so startup never depends on
-# the network (ttyd/tmux/jq were previously apk-installed on every boot)
-RUN apk add --no-cache \
+# the network (ttyd/tmux/jq were previously apk-installed on every boot).
+# apk upgrade first: the base image's own packages are only as fresh as its
+# last publish, and Alpine ships CVE fixes as package revisions in between.
+RUN apk upgrade --no-cache \
+    && apk add --no-cache \
     bash \
     curl \
     git \
     jq \
     nano \
+    nginx \
     nodejs \
     npm \
     py3-aiohttp \
@@ -32,9 +36,10 @@ RUN apk upgrade --no-cache ca-certificates \
         "pip>=26.2.2" "certifi>=2026.10.19" \
     && update-ca-certificates
 
-# uv from PyPI, pinned: Alpine 3.21's apk uv (0.5.x) cannot install managed
-# musl CPython builds, which ha-mcp >= 4.x needs (it requires Python 3.13;
-# Alpine 3.21 ships 3.12). musllinux wheels exist for all three arches.
+# uv from PyPI, pinned rather than from apk: uv versions move faster than
+# Alpine's, and ha-mcp runs on a uv-managed musl CPython 3.13 (Alpine 3.21's
+# apk uv 0.5.x could not install those at all). musllinux wheels exist for
+# both arches.
 RUN pip3 install --no-cache-dir --break-system-packages uv==0.11.28
 
 # Keep the npm cache out of persistent storage so it never lands in HA backups
@@ -78,6 +83,11 @@ COPY bridge/ /opt/bridge/
 RUN cd /opt/bridge \
     && npm ci --omit=dev --no-audit --no-fund \
     && rm -rf /opt/bridge/test /tmp/npm-cache
+
+# ttyd's own page plus ttyd-extras.js (the OSC 52 clipboard handler),
+# served by run.sh via `ttyd --index`. Built here, once, from this image's
+# ttyd, so the boot path never fetches or patches anything.
+RUN /opt/scripts/build-ttyd-index.sh /opt/ttyd/index.html
 
 # Use exec form for better signal handling
 CMD ["/run.sh"]

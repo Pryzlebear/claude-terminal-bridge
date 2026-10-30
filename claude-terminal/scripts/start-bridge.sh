@@ -17,29 +17,31 @@ start_bridge() {
     fi
 
     local list_opts
-    # bashio returns list options one item per line
+    # bashio returns list options one item per line. Every read carries a
+    # fallback: on the 3.24 base a failed option read exits non-zero, and
+    # set -e must never end startup over a bridge option (same as run.sh).
     export BRIDGE_PORT=8099
     export BRIDGE_DATA_DIR=/data/bridge
     export BRIDGE_WORKDIR
-    BRIDGE_WORKDIR=$(get_working_directory)
+    BRIDGE_WORKDIR=$(get_working_directory) || BRIDGE_WORKDIR=/config
     export BRIDGE_PUBLIC_URL
-    BRIDGE_PUBLIC_URL=$(bashio::config 'bridge_public_url' '')
+    BRIDGE_PUBLIC_URL=$(bashio::config 'bridge_public_url' '') || BRIDGE_PUBLIC_URL=""
     export BRIDGE_ACCESS_KEY
-    BRIDGE_ACCESS_KEY=$(bashio::config 'bridge_access_key' '')
+    BRIDGE_ACCESS_KEY=$(bashio::config 'bridge_access_key' '') || BRIDGE_ACCESS_KEY=""
     export BRIDGE_PERMISSION_MODE
-    BRIDGE_PERMISSION_MODE=$(bashio::config 'bridge_permission_mode' 'auto')
+    BRIDGE_PERMISSION_MODE=$(bashio::config 'bridge_permission_mode' 'auto') || BRIDGE_PERMISSION_MODE="auto"
     export BRIDGE_MODEL
-    BRIDGE_MODEL=$(bashio::config 'bridge_model' '')
+    BRIDGE_MODEL=$(bashio::config 'bridge_model' '') || BRIDGE_MODEL=""
     export BRIDGE_TIMEOUT_MINUTES
-    BRIDGE_TIMEOUT_MINUTES=$(bashio::config 'bridge_timeout_minutes' '20')
+    BRIDGE_TIMEOUT_MINUTES=$(bashio::config 'bridge_timeout_minutes' '20') || BRIDGE_TIMEOUT_MINUTES="20"
     export BRIDGE_NOTIFY
-    BRIDGE_NOTIFY=$(bashio::config 'bridge_notify' 'true')
+    BRIDGE_NOTIFY=$(bashio::config 'bridge_notify' 'true') || BRIDGE_NOTIFY="true"
 
-    list_opts=$(bashio::config 'bridge_protected_domains' '')
+    list_opts=$(bashio::config 'bridge_protected_domains' '') || list_opts=""
     export BRIDGE_PROTECTED_DOMAINS="${list_opts//$'\n'/,}"
-    list_opts=$(bashio::config 'bridge_protected_patterns' '')
+    list_opts=$(bashio::config 'bridge_protected_patterns' '') || list_opts=""
     export BRIDGE_PROTECTED_PATTERNS="${list_opts//$'\n'/,}"
-    list_opts=$(bashio::config 'bridge_allowed_sources' '')
+    list_opts=$(bashio::config 'bridge_allowed_sources' '') || list_opts=""
     export BRIDGE_ALLOWED_SOURCES="${list_opts//$'\n'/,}"
 
     # bashio prints "null" for unset optional values
